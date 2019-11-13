@@ -6,12 +6,19 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node index.js",
-    "dev": "nodemon index.js"
+    "dev": "nodemon index.js",
+	"build": "parcel build app/scripts/src/main.js -d app/scripts/dist/",
+	"watch": "parcel watch app/scripts/src/main.js -d app/scripts/dist/"
   },
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "nodemon": "^1.19.4"
+    "babel-core": "^6.26.3",
+    "babel-preset-es2015": "^6.24.1",
+    "babelify": "^10.0.0",
+    "browserify": "^16.5.0",
+    "nodemon": "^1.19.4",
+    "watchify": "^3.11.1"
   },
   "dependencies": {
     "mime": "^2.4.4",
