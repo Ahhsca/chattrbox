@@ -1,31 +1,38 @@
-let socket;
+var WebSocket = require('ws');
+var WebSocketServer = WebSocket.Server;
+var port = 3001;
+var topic = '';
+var broadcastData = '';
+var ws = new WebSocketServer({
+  port: port
+});
+var messages = [];
 
-function init(url) {
-	socket = new WebSocket(url);
-	console.log('connecting...');
-}
+console.log('websockets server started');
 
-function registerOpenHandler(handlerFunction) {
-	socket.onopen = () => {
-		console.log('open');
-		handlerFunction();
-	};
-}
+ws.on('connection', function (socket) {
+  console.log('client connection established');
 
-function registerMessageHandler(handlerFunction) {
-	socket.onmessage = (e) => {
-		console.log('message', e.data);
-		let data = JSON.parse(e.data);
-		handlerFunction(data);
-	};
-}
+  if (topic) {
+    socket.send('*** Topic is\'' + topic + '\'');
+  }
 
-function sendMessage(payload) {
-	socket.send(JSON.stringify(payload));
-}
-export default {
-	init,
-	registerOpenHandler,
-	registerMessageHandler,
-	sendMessage
-}
+  messages.forEach(function (msg) {
+    socket.send(msg);
+  });
+
+  socket.on('message', function (data) {
+    console.log('message received: ' + data);
+
+    if (data.indexOf('/topic') == 0) {
+      topic = data.slice(6);
+      broadcastData = 'Topic has changed to\'' + topic + '\'';
+    } else {
+      broadcastData = data;
+      messages.push(broadcastData);
+    }
+    ws.clients.forEach(function (clientSocket) {
+      clientSocket.send(broadcastData);
+    });
+  });
+});
